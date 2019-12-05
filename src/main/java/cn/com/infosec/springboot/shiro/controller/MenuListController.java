@@ -56,6 +56,17 @@ public class MenuListController {
 			}
 		}
 
+//		if (subject.hasRole("admin") == false) {
+//
+//			logger.error("role: /WEB-INF/jsp/index.jsp");
+//			return "index";
+//		}
+//		if (subject.isPermitted("system") == false) {
+//
+//			logger.error("permission: /WEB-INF/jsp/index.jsp");
+//			return "index";
+//		}
+
 		modelMap.put("username", username);
 		modelMap.put("password", password);
 		modelMap.put("rememberMe", rememberMe);

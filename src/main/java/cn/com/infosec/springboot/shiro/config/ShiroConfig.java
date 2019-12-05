@@ -1,16 +1,12 @@
 package cn.com.infosec.springboot.shiro.config;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
-
-import javax.servlet.Filter;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.web.filter.authc.AnonymousFilter;
-import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
-import org.apache.shiro.web.filter.authc.LogoutFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -18,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 @Configuration
 public class ShiroConfig {
@@ -63,29 +60,39 @@ public class ShiroConfig {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		shiroFilterFactoryBean.setSecurityManager(securityManager());
 
-		shiroFilterFactoryBean.setLoginUrl("/index.do");
-		shiroFilterFactoryBean.setSuccessUrl("/main.do");
-		shiroFilterFactoryBean.setUnauthorizedUrl("/forbidden.do");
-
-		Map<String, Filter> filters = new TreeMap<String, Filter>();
-
-		filters.put("anon", new AnonymousFilter());
-		filters.put("authc", new FormAuthenticationFilter());
-		filters.put("logout", new LogoutFilter());
-
-		shiroFilterFactoryBean.setFilters(filters);
+//		Map<String, Filter> filters = new TreeMap<String, Filter>();
+//
+//		filters.put("anon", new AnonymousFilter());
+//		filters.put("authc", new FormAuthenticationFilter());
+//		filters.put("logout", new LogoutFilter());
+//
+//		shiroFilterFactoryBean.setFilters(filters);
 
 		Map<String, String> chainDefinition = new TreeMap<String, String>();
 		chainDefinition.put("/js/**", "anon");
 		chainDefinition.put("/css/**", "anon");
-		chainDefinition.put("/img/**", "anon");
 
 		chainDefinition.put("/favicon.ico", "anon");
 		chainDefinition.put("/logout.do", "logout");
 
 		chainDefinition.put("/*.do", "authc");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(chainDefinition);
+
+		shiroFilterFactoryBean.setLoginUrl("/index.do");
+		shiroFilterFactoryBean.setSuccessUrl("/main.do");
+//		shiroFilterFactoryBean.setUnauthorizedUrl("/forbidden.do");
 		return shiroFilterFactoryBean;
+	}
+
+	@Bean
+	public SimpleMappingExceptionResolver exceptionResolver() {
+		SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
+
+		Properties properties = new Properties();
+		properties.setProperty("org.apache.shiro.authz.UnauthorizedException", "/forbidden");
+
+		exceptionResolver.setExceptionMappings(properties);
+		return exceptionResolver;
 	}
 
 }
